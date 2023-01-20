@@ -1,0 +1,58 @@
+﻿@using Chinook.Data.Interfaces;
+@using Chinook.Models;
+@using Microsoft.EntityFrameworkCore;
+@using System.Security.Claims;
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Chinook</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span>Home
+            </NavLink>
+        </div>
+        @foreach (var pList in Playlist)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="@GetLink(@pList.PlaylistId)">
+                    <i class="bi bi-music-note-list me-3" style="font-size: 1.25em"></i>@pList.Name
+                </NavLink>
+            </div>
+        }
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    [Inject] INavBarData _navbarData { get; set; }
+    [CascadingParameter] private Task<AuthenticationState> authenticationState { get; set; }
+    private IList<Playlist> Playlist;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await authenticationState).User;
+        string CurrentUserId = user.FindFirst(u => u.Type.Contains(ClaimTypes.NameIdentifier))?.Value;
+
+        Playlist = await _navbarData.GetArtists(CurrentUserId);
+    }
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private string GetLink(long playListId)
+    {
+        return "playlist/"+playListId;
+    }
+}
