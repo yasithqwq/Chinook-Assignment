@@ -18,10 +18,12 @@ builder.Services.AddDefaultIdentity<ChinookUser>(options => options.SignIn.Requi
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
+//DI Data Classes
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ChinookUser>>();
 builder.Services.AddScoped<IHomeData, HomeData>();
 builder.Services.AddScoped<IPlayListData, PlayListData>();
 builder.Services.AddScoped<INavBarData, NavBarData>();
+builder.Services.AddScoped<IArtistData, ArtistData>();
 
 var app = builder.Build();
 
